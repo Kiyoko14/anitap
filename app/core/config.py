@@ -37,5 +37,8 @@ class Settings(BaseSettings):
     # Rate limiting (requests per minute per IP)
     RATE_LIMIT_PER_MINUTE: int = 300
 
+    # CORS
+    CORS_ORIGINS: list[str] = ["https://ani.thinksync.art"]
+
 
 settings = Settings()  # type: ignore[call-arg]

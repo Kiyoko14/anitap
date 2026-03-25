@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "copilot/**"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run ruff (lint + format check)
+        run: ruff check . && ruff format --check .
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        env:
+          DATABASE_URL: "postgresql+asyncpg://postgres:postgres@localhost:5432/test"
+          REDIS_URL: "redis://localhost:6379"
+          SECRET_KEY: "ci-test-secret-key"
+          TELEGRAM_BOT_TOKEN: "000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        run: pytest tests/ -v --tb=short
